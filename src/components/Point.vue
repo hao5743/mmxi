@@ -1,36 +1,65 @@
 <template>
   <div>
-     <x-header :left-options="{showBack: true}">穴位详情</x-header>
-     <group>
-     <panel :list="list" type="1"></panel>
-     </group>
+     <x-header :left-options="{showBack: false}">穴位详情</x-header>
+     <x-button type="primary" @click.native="back">返回</x-button>
+     
+     <div class="card">
+       <div>穴位名称: {{point.point}}</div>
+       <div>所属经络: {{point.kind}}</div>
+       <div>分类: {{point.category}}</div>
+     </div>
     <!--<h2>{{ $route.query.name }}</h2>  -->
+
      <tab>
-      <tab-item selected @on-item-click="onItemClick">概述</tab-item>
+      <tab-item selected @on-item-click="onItemClick">主治</tab-item>
+   
       <tab-item @on-item-click="onItemClick">定位</tab-item>
-      <tab-item @on-item-click="onItemClick">取穴</tab-item>
+      <tab-item @on-item-click="onItemClick">配伍</tab-item>
     </tab>
+    <div v-if="tabIndex==0" class="info">
+      <!--<p>{{point.dissection}}</p>-->
+      <p class="mydivider">主治</p>
+      <p>{{point.attending}}</p>
+       <p class="mydivider">图片</p>
+      <x-img :src="point.image" ></x-img>
+    </div>
+    <div v-if="tabIndex==1" class="info">
+     <p> {{point.location}}</p>
+    </div>
+    <div v-if="tabIndex==2" class="info">
+      <p>{{point.compatibility}}</p>
+    </div>
+
   </div>
 </template>
 
 <script>
-import { XHeader,Tab,TabItem, Panel, Group } from 'vux'
+import { XHeader,Tab,TabItem ,XButton,XImg} from 'vux'
+import router from '../router'
 export default {
   name: 'point',
-  components:{XHeader,Tab,TabItem,Panel,Group},
+  components:{XHeader,Tab,TabItem,XButton,XImg},
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App',
-      list: [{
-        src: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-        title: '云门',
-        desc: '现代常用于治疗气管炎、支气管炎等。配中府、期门等主治胸肋痛。'
-      }]
+      point: {},
+      tabIndex: 0
     }
+  },
+  created () {
+    this.point = this.$route.query.point
+    console.log(this.point)
   },
    methods: {
     onItemClick (index) {
       console.log('on item click:', index)
+      this.tabIndex = index;
+    },
+    back(){
+      console.log('back')
+      router.back()
+    },
+    fetchDetail (){
+      
     }
    }
 }
@@ -54,5 +83,15 @@ li {
 
 a {
   color: #42b983;
+}
+
+.info {
+  padding: 12px;
+}
+.card {
+  padding:16px;
+}
+.mydivider {
+  background: lightgray
 }
 </style>
