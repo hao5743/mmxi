@@ -1,38 +1,27 @@
 <template>
   <div>
-     <x-header :left-options="{showBack: true}">穴位详情</x-header>
-     
-     <div class="card">
-       <div>穴位名称: {{point.point}}</div>
-       <div>所属经络: {{point.kind}}</div>
-       <div>分类: {{point.category}}</div>
-     </div>
-    <!--<h2>{{ $route.query.name }}</h2>  -->
-
+     <x-header :left-options="{showBack: true}">{{point.name}}</x-header>
      <tab>
-      <tab-item selected @on-item-click="onItemClick">主治</tab-item>
-   
-      <tab-item @on-item-click="onItemClick">定位</tab-item>
-      <tab-item @on-item-click="onItemClick">配伍</tab-item>
+      <tab-item selected @on-item-click="onItemClick">经脉循行</tab-item>
+      <tab-item @on-item-click="onItemClick">主要病候</tab-item>
+      <tab-item @on-item-click="onItemClick">主治概要</tab-item>
     </tab>
     <div v-if="tabIndex==0" class="info">
-      <!--<p>{{point.dissection}}</p>-->
-      <p class="mydivider">主治</p>
-      <p>{{point.attending}}</p>
+      <p>{{point.meridian}}</p>
       <p class="mydivider">图片</p>
-      <div style="text-align:center;">
-          <span style="font-size:18px;color:gray;">
-            <spinner type="ios" slot="value"></spinner>
-          </span>
-          <x-img :src="point.image" @on-success="success" @on-error="error" class="ximg-demo" error-class="ximg-error"></x-img>
-      </div>
     
+      <div v-for="src in point.images" style="text-align:center;">
+        <span style="font-size:18px;color:gray;">
+          <spinner type="ios" slot="value"></spinner>
+        </span>
+        <x-img :src="src" @on-success="success" @on-error="error" class="ximg-demo" error-class="ximg-error"></x-img>
+      </div>
     </div>
     <div v-if="tabIndex==1" class="info">
-     <p> {{point.location}}</p>
+     <p> {{point.symptom}}</p>
     </div>
     <div v-if="tabIndex==2" class="info">
-      <p>{{point.compatibility}}</p>
+      <p>{{point.attending}}</p>
     </div>
 
   </div>
@@ -41,36 +30,39 @@
 <script>
 import { XHeader,Tab,TabItem ,XButton,XImg,Spinner} from 'vux'
 import router from '../router'
+import meridians from '../json/meridians'
+console.log(meridians)
 export default {
-  name: 'point',
+  name: 'jingluo',
   components:{XHeader,Tab,TabItem,XButton,XImg,Spinner},
   data () {
     return {
       point: {},
+      name:'',
       tabIndex: 0
     }
   },
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      // 通过 `vm` 访问组件实例
-      vm.point = vm.$route.query.point
-    })
-  },  
   created () {
     console.log('created')
-    this.point = this.$route.query.point
+    this.name = this.$route.query.name
+    this.getDetail(this.name)
     console.log(this.point)
-  },
-  mounted(){
-    console.log('mounted')
-  },
-  destroyed(){
-    console.log('destroyed')
   },
    methods: {
     onItemClick (index) {
       console.log('on item click:', index)
       this.tabIndex = index;
+    },
+    getDetail(name){
+      for(let i=0;i<meridians.length;i++){
+         if(meridians[i].name == name){
+          this.point = meridians[i];
+        }
+      }
+    },
+    back(){
+      console.log('back')
+      router.back()
     },
     fetchDetail (){
       
@@ -110,11 +102,11 @@ a {
 }
 
 p{
-  padding: 10px;
+  padding:10px;
 }
 
 .info {
-  padding: 12px 5px;
+  padding: 2px 5px;
 }
 .card {
   padding:16px;
@@ -122,6 +114,10 @@ p{
 .mydivider {
   background: lightgray;
   padding:2px 6px
+}
+.title {
+  font-size: 20px;
+  padding: 16px;
 }
 .ximg-demo {
   width: 100%;

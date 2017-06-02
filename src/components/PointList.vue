@@ -1,7 +1,10 @@
 <template>
   <div>
-    <x-header fixed :left-options="{showBack: false}">经脉穴位大全</x-header>
-
+    <!--<x-header fixed :left-options="{showBack: false}">经脉穴位大全</x-header>
+    <tab :line-width="1" custom-bar-width="60px">
+      <tab-item selected>穴位</tab-item>
+      <tab-item>疾病</tab-item>
+    </tab>-->
      <search
     @result-click="resultClick"
     @on-change="getResult"
@@ -23,7 +26,7 @@
         </grid>
       </div>
 
-      <group title="经脉穴位" v-if="!searching">
+      <group title="" v-if="!searching">
       <div v-for="item in Object.keys(items)" key="item">
          <cell
           class="mycell"
@@ -33,11 +36,18 @@
           :arrow-direction="showContent001 ? 'up' : 'down'"
           @click.native="open(item)"></cell>
           <template v-if="currentOpen == item ">
+                <cell-box is-link @click.native="showJlDetail(item)">
+                  {{item}}
+                </cell-box>
                 <grid :rows="4">
-                  <grid-item v-for="i in items[item]" :key="i" @click.native="showDetail(i)">
-                    <span class="grid-center">{{i.point.split(' ')[0]}}</span>
+                  <grid-item v-for="i in items[item]" :key="i" @click.native="showDetail(i)" style="padding:8px">
+                    <span class="grid-center">{{i.point.split(' ')[0] | cat}}</span>
                   </grid-item>
                 </grid>
+                <!--<template v-for="(e,index) in items[item]" >
+                        <a @click.native="showDetail(e)">{{e.point.split(' ')[0]}}</a>
+                    <span v-if="(index+1)%4==0 && index>0"></br></span>
+                </template>-->
           </template>
       </div>
       </group>
@@ -45,19 +55,19 @@
 </template>
 
 <script>
-import { XHeader,Cell, CellBox, CellFormPreview, Group, Grid, GridItem, GroupTitle ,Search, Divider } from 'vux'
+import { XHeader,Cell, CellBox, CellFormPreview, Group, Grid, GridItem, GroupTitle ,Search, Divider,Tab,TabItem } from 'vux'
 import router from '../router'
-
 export default {
   components: {
     XHeader,Divider,
     Cell,
-    CellBox,CellFormPreview,Group,Grid, GridItem, GroupTitle,Search
+    CellBox,CellFormPreview,Group,Grid, GridItem, GroupTitle,Search,Tab,TabItem
   },
   data () {
     return {
       currentOpen:'',
       items: this.$store.state.jingluos,
+      points: this.$store.state.points,
       hotPoints:["商阳","二间","三间","合谷","阳溪","偏历","温溜","下廉","侠白","尺泽"],
       showContent001: false,
       showContent002: false,
@@ -78,11 +88,10 @@ export default {
     },
     resultClick (item) {
       // window.alert('you click the result item: ' + JSON.stringify(item))
-      this.showDetail(this.value)
+      this.showDetail(item.other)
     },
     getResult (val) {
-      this.results = val ? searchData(val) : []
-      console.log(this.results)
+      this.results = val ? this.searchData(val) : []
     },
     onSubmit () {
       this.$vux.toast.show({
@@ -98,20 +107,26 @@ export default {
     onCancel () {
       console.log('on cancel')
       this.searching = false
+    },
+    searchData(val){
+      let ans=[];
+      this.points.forEach(function(e) {
+        if(e.point.indexOf(val)>=0 || e.pinyin[0].indexOf(val)>=0 ||e.pinyin[1].indexOf(val)>=0 ){
+          ans.push({title:e.point,other:e});
+        }
+      }, this);
+      return ans;
+    },
+    showJlDetail(item){
+      console.log(item)
+      router.push({ name: 'jingluo',query: { name:item }})
+    }
+  },
+  filters: {
+    cat: function (value) {
+      return value.length>3 ? value.substring(0,2)+'...' : value
     }
   }
-}
-
-function searchData(val){
-  let ans=[];
-  LocalData.forEach((e)=> {
-    e.content.forEach((data)=>{
-      if(data.indexOf(val)>=0){
-        ans.push({title:data,other:{}});
-      }
-    })
-  });
-  return ans;
 }
 
 </script>
@@ -136,6 +151,6 @@ function searchData(val){
   padding:6px;
 }
 .mycell{
-  background: #edf6ea
+  background: #fbf9fe
 }
 </style>

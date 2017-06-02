@@ -1,9 +1,7 @@
 <template>
   <div id="app">
-    <transition>
-      <keep-alive>
+    <transition name="fade">
         <router-view></router-view>
-      </keep-alive>
     </transition>
   </div>
 </template>
@@ -19,5 +17,17 @@ export default {
 
 body {
   background-color: #fbf9fe;
+}
+.fade-enter-active, .fade-leave-active {
+  transition-property: opacity;
+  transition-duration: .25s;
+}
+
+.fade-enter-active {
+  transition-delay: .25s;
+}
+
+.fade-enter, .fade-leave-active {
+  opacity: 0
 }
 </style>

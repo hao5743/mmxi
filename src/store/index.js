@@ -1,9 +1,17 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
+// import VueResource from 'vue-resource'
+
+// Vue.use(VueResource);
 Vue.use(Vuex)
 
+// import points from './data'
 import points from '../json/points.json'
 const jingluos=getJingluo()
+
+function readData(){
+
+}
 
 export default new Vuex.Store({
   state: {
